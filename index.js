@@ -1,51 +1,23 @@
+// example file: index.js
 const express = require('express');
 const multer = require('multer');
-const axios = require('axios');
-const FormData = require('form-data');
-
 const app = express();
 const upload = multer();
 
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  if (req.method === "OPTIONS") return res.sendStatus(200);
-  next();
-});
-
-app.post("/yt-to-midi", upload.single("file"), async (req, res) => {
+app.post('/convert', upload.single('file'), async (req, res) => {
   try {
-    const form = new FormData();
+    // Your actual conversion logic here, e.g., parse the uploaded file
+    const midiFileBuffer = req.file.buffer; // binary data
 
-    if (req.body.youtubeUrl) {
-      form.append("youtubeUrl", req.body.youtubeUrl);
-    }
-
-    if (req.file) {
-      form.append("file", req.file.buffer, {
-        filename: req.file.originalname,
-        contentType: req.file.mimetype,
-      });
-    }
-
-    const response = await axios.post(
-      "https://mcpuzzle.app.n8n.cloud/webhook/yt-to-midi", // ✅ PRODUCTION URL
-      form,
-      {
-        headers: form.getHeaders(),
-        responseType: "arraybuffer"
-      }
-    ); // ✅ fixed: only one closing bracket here
-
-    res.setHeader("Content-Type", "application/zip");
-    res.setHeader("Content-Disposition", "attachment; filename=midi-files.zip");
-    res.send(response.data);
+    // Example: Respond with dummy zip to simulate
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', 'attachment; filename=converted.zip');
+    res.send(midiFileBuffer); // Replace with actual .zip file buffer!
   } catch (error) {
-    console.error(error?.response?.data || error.message);
-    res.status(500).json({ error: "Proxy failed", details: error.message });
+    console.error('Conversion error:', error);
+    res.status(500).json({ error: 'Conversion failed' });
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Proxy running on port ${PORT}`));
+app.listen(PORT, () => console.log(`YT-MIDI server running on port ${PORT}`));
