@@ -29,16 +29,14 @@ app.post("/yt-to-midi", upload.single("file"), async (req, res) => {
       });
     }
 
-const response = await axios.post(
-  "https://mcpuzzle.app.n8n.cloud/webhook/yt-to-midi", // ✅ PRODUCTION URL
-  form,
-  {
-    headers: form.getHeaders(),
-    responseType: "arraybuffer",
-  }
-);
-
-    );
+    const response = await axios.post(
+      "https://mcpuzzle.app.n8n.cloud/webhook/yt-to-midi", // ✅ PRODUCTION URL
+      form,
+      {
+        headers: form.getHeaders(),
+        responseType: "arraybuffer"
+      }
+    ); // ✅ fixed: only one closing bracket here
 
     res.setHeader("Content-Type", "application/zip");
     res.setHeader("Content-Disposition", "attachment; filename=midi-files.zip");
